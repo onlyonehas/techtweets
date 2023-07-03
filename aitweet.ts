@@ -1,5 +1,9 @@
 import { Configuration, OpenAIApi, CreateCompletionRequest } from 'openai';
-import 'dotenv/config'
+import {Client} from 'twitter-api-sdk';
+import dotenv from "dotenv";
+
+
+dotenv.config();
 
 const configuration = new Configuration({
   organization: process.env.OPENAI_API_ORG,
@@ -22,11 +26,10 @@ async function generateTweet() {
     stop: '\n',
   };
 
-  let tweet
+  let tweet;
   try {
     const completion = await openai.createCompletion(request);
-    const response = await openai.createCompletion(request);
-    tweet = response.data.choices[0].text.trim();
+    tweet = completion.data.choices[0].text.trim();
     console.log(completion.data.choices[0].text);
   } catch (error) {
     if (error.response) {
@@ -41,34 +44,21 @@ async function generateTweet() {
 }
 
 async function postTweet(tweet: string) {
-  // Replace this with your own Twitter API code to post the tweet
-  // For example, you can use the 'twitter' package or any other Twitter API client library
-  // Consult the documentation for the specific library you choose to use
+  const client = new Client(process.env.BEARER_TOKEN);
 
-  // Example using 'twitter' package:
-  const Twitter = require('twitter');
-
-  const client = new Twitter({
-    consumer_key: process.env.TWITTER_CONSUMER_KEY,
-    consumer_secret: process.env.TWITTER_CONSUMER_SECRET,
-    access_token_key: process.env.TWITTER_ACCESS_TOKEN_KEY,
-    access_token_secret: process.env.TWITTER_ACCESS_TOKEN_SECRET,
-  });
-
-  client.post('statuses/update', { status: tweet }, function (error: any, tweet: any, response: any) {
-    if (error) {
-      console.error('Error posting tweet:', error);
-    } else {
-      console.log('Tweet posted successfully:', tweet.text);
-    }
-  });
+  try {
+    const response = await client.tweets.createTweet({text: tweet});
+    console.log('Tweet posted successfully:', response.data.text);
+  } catch (error) {
+    console.error('Error posting tweet:', error);
+  }
 }
 
 async function generateAndPostTweet() {
   try {
-    const tweet = await generateTweet();
-    console.log('tweet', tweet)
-    await postTweet(tweet);
+    // const tweet = await generateTweet();
+    // console.log('tweet', tweet);
+    await postTweet("Test tweet");
   } catch (error) {
     console.error('Error generating and posting tweet:', error);
   }

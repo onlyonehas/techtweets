@@ -1,8 +1,11 @@
 {
     "compilerOptions": {
         "module": "commonjs",
-        "target": "es2017",
-        "esModuleInterop": true
+        "target": "es2015",
+        "esModuleInterop": true,
+        "lib": ["es6"],
+        "skipLibCheck": true,
+        "moduleResolution": "node",
     },
     "include": [
         "./aitweet.ts"
